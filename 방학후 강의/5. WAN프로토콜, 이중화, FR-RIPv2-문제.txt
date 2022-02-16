@@ -1,0 +1,33 @@
+1. IP주소를 도면과 동일하게 부여.
+  - 게이트웨이 주소 또는 주어지지 않은 IP주소는 서브넷에서 사용가능한 마지막 주소를 사용.
+  - PC6 DCHP를 사용하는데, R6으로 부터 DCHP 서비스를 제공
+  - ** PC0 ~ PC2 의 게이트웨이 주소는 서브넷에서 사용가능한 마지막 주소
+    => R1, R2에는 도면에 제시된 IP주소를 입력해야 합니다.
+
+2. VLAN 작업은 도면을 참고해서 해결하시오.
+
+3. 프레임릴레이 구간을 브로드캐스트 도메인으로 구성
+[지난 동영상에서의 설정 참고]
+interface Serial0/0/0
+ ip address 20.0.10.3 255.255.255.0
+ encapsulation frame-relay
+ frame-relay map ip 20.0.10.2 403 broadcast
+ frame-relay map ip 20.0.10.1 403 broadcast
+(x) ip ospf network broadcast
+(x) ip ospf priority 0
+ no shut
+
+4. RIPv2 풀라우팅
+
+------------아래는 같이 수업을 진행--------------
+
+5. 게이트웨이 이중화
+ R1, R2 중 R1에 PC0~PC2의 게이트웨이 역할을 하다가, 
+          문제발생시 R2가 게이트웨이 역할을 이어가도록
+6. PPP 
+    CHAP : R5-R6
+    PAP : R4-R7
+
+
+  
+              

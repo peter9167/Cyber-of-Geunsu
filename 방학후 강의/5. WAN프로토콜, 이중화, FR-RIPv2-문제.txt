@@ -28,6 +28,34 @@ interface Serial0/0/0
     CHAP : R5-R6
     PAP : R4-R7
 
+CHAP, PAP 는 PPP를 사용하고 있는 라우터들끼리 연결될 때 서로 인증을 거쳐서 연결하는 방식.
+WAN을 연결할 때 케이블만 연결하고, 프로토콜만 일치시키면 통신이 가능했음. WAN 보안 기능으로 연결되는 라우터 중 PPP를 사용하여ㅑ 라우터들끼리 서로 암호를 사용하여 인증 후 통신이 가능하게 
+
+
+PPP/PAP
+PPP를 사용하고 있는 라우터에 PAP 인증을 추가
+PAP 활성화를 위해서는 
+ 두 라우터에서 인증을 위해 사용한 계정
+ 다른 계정을 사용해도 되고, 같은 계정을 사용해도 됨
+ username pppAuth password pass12##     	<-- 자신의 username을 만든 후 아래 인증을 해야 함.
+
+R4
+int s0/0/0  	     <---- 인터페이스(포트) 번호
+ en ppp
+ ppp authen ?pap/chap <<-- pap(패스워드) 인증이나 chap 인증 방식 둘중 무엇으로 할거냐 
+                                  <-- 우리는 pap 인증 방식을 사용하여 아래와 같은 명령어를 사용함.
+ ppp authen pap
+ ppp pap sent-username [상대라우터 ID] password [PW]
+
+위에 내용을 정리하면 아래와 같음
+
+R4
+int s0/0/0
+ en ppp
+ ppp authen pap
+ ppp pap sent-username pppAuth password pass12##
+
+
 
   
               

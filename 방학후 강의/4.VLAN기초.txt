@@ -112,13 +112,75 @@ interface Serial0/0/0
 R3 = DR 로서 모든 라우팅 테이블을 가지고 있고
 R2, R4 = 선택적으로 라우팅이 미완성
 
+DR(반장) R3 의 ospf 추가로 네이버 설정을 진행
+R3(config)#router ospf 20
+R3(config-router)#neighbor 20.0.10.3   <---- R4의 대한 설정
+R3(config-router)#neighbor 20.0.10.1   <---- R2의 대한 설정
+
+-- 미 해결시 -- 
+
+R2 ospf 추가로 네이버 설정을 진행
+router ospf 20
+ neighbor 20.0.10.3
+
+R4 ospf 추가로 네이버 설정을 진행
+router ospf 20
+ neighbor 20.0.10.1
 
 
+frame-relay ospf 적용되어 있는 경우
+1) frame-relay 스위치에 DLCI 값을 설정
+ config > Serial 0, 1, 2
+2) frame-relay 스위치에 DLCI 매칭
+3) 라우터에 프레임 릴레이 설정
+
+** 프레임 릴레이 설정 후 ospf 설정을 해야 한다.
+[R2]
+interface Serial0/0/0
+ ip address 20.0.10.1 255.255.255.0
+ encapsulation frame-relay
+ frame-relay map ip 20.0.10.3 203 broadcast
+ frame-relay map ip 20.0.10.2 203 broadcast
+ ip ospf network broadcast
+ ip ospf priority 0				<---- 기본값1, 최대값 255
+ no shut
+
+router ospf 20
+ network ~
+ neighbor 20.0.10.3   <--- R4와  수동으로 네이버
 
 
+[R3] - DR
+interface Serial0/0/0
+ ip address 20.0.10.2 255.255.255.0         	<---- 자기의 IP를 설정하고
+ encapsulation frame-relay		     	<---- 인캡슐레이션을 frame-relay로 설정
+					** 여기서 인캡슐레이션이란!!
+					인캡슐레이션이란 간단하게 말해서 PC에서 다른 PC로 데이터를 전송할 때 데이터를 패키지화하는 과정을 말한다. (전송될 데이터가 각 계층에서 해당 계층의 헤더가 붙어 캡슐화 되는 것을 말한다.)
+					** 자세한 내용은 아래 링크로!
+		** https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=asd7979&logNo=30102509280
+ frame-relay map ip 20.0.10.1 302 broadcast	<---- 라우터 전부 통신할 수 있도록 수동으로 매칭
+ frame-relay map ip 20.0.10.3 304 broadcast	<---- 라우터 전부 통신할 수 있도록 수동으로 매칭
+ ip ospf network broadcast			<---- 
+ no shut
 
 
+[R4]
+interface Serial0/0/0
+ ip address 20.0.10.3 255.255.255.0
+ encapsulation frame-relay
+ frame-relay map ip 20.0.10.2 403 broadcast
+ frame-relay map ip 20.0.10.1 403 broadcast
+ ip ospf network broadcast
+ ip ospf priority 0
+ no shut
+
+router ospf 20
+ network ~
+ neighbor 20.0.10.3   <--- R2와  수동으로 네이버
 
 
-
-
+sh ip ospf nei
+ => 이웃된 ospf 라우터를 확인
+ => R2 = 2개 (R1, R3 -DR) -- R4 수동으로 네이버
+ => R3 = 3개 (R2, R4, R5)
+ => R4 = 2개 (R3 -DR, R6)
